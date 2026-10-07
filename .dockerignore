@@ -1,0 +1,41 @@
+# Environnement virtuel
+env/
+venv/
+.venv/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# Django
+*.sqlite3
+db.sqlite3
+staticfiles/
+media/
+
+# Variables d'env
+.env
+.env.local
+
+# Git
+.git/
+.gitignore
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# Traductions compilées (recompilées dans l'image)
+*.mo
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Docs
+docs/
+README.md

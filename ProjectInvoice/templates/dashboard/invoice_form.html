@@ -1,0 +1,164 @@
+{% extends "account/base.html" %}
+{% load i18n %}
+
+{% block head_title %}{% trans "Nouvelle facture" %}{% endblock %}
+
+{% block content %}
+<form method="post" class="max-w-3xl mx-auto animate-fadeInUp">
+  {% csrf_token %}
+
+  <!-- Carte : infos client -->
+  <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm p-6 mb-5">
+    <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+      <i class="fa-solid fa-user text-brand-600 dark:text-brand-400 mr-2"></i>
+      {% trans "Informations client" %}
+    </h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ client_form.name.label }}</label>
+        {{ client_form.name }}
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ client_form.phone.label }}</label>
+        {{ client_form.phone }}
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ client_form.email.label }}</label>
+        {{ client_form.email }}
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ client_form.address.label }}</label>
+        {{ client_form.address }}
+      </div>
+    </div>
+  </div>
+
+  <!-- Carte : détails facture -->
+  <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm p-6 mb-5">
+    <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+      <i class="fa-solid fa-calendar text-brand-600 dark:text-brand-400 mr-2"></i>
+      {% trans "Détails" %}
+    </h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ invoice_form.issue_date.label }}</label>
+        {{ invoice_form.issue_date }}
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ invoice_form.due_date.label }}</label>
+        {{ invoice_form.due_date }}
+      </div>
+    </div>
+  </div>
+
+  <!-- Carte : produits -->
+  <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm p-6 mb-5">
+    <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+      <i class="fa-solid fa-box text-brand-600 dark:text-brand-400 mr-2"></i>
+      {% trans "Produits" %}
+    </h2>
+
+    {{ formset.management_form }}
+
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm" id="items-table">
+        <thead class="text-xs uppercase text-gray-500 dark:text-gray-400">
+          <tr>
+            <th class="py-2 text-left">{% trans "Produit" %}</th>
+            <th class="py-2 text-left w-24">{% trans "Qté" %}</th>
+            <th class="py-2 text-left w-40">{% trans "PU (FCFA)" %}</th>
+            <th class="py-2 w-10"></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for form in formset %}
+          <tr class="item-row border-t border-gray-100 dark:border-gray-700">
+            {{ form.id }}
+            <td class="py-2 pr-2">{{ form.description }}</td>
+            <td class="py-2 pr-2">{{ form.quantity }}</td>
+            <td class="py-2 pr-2">{{ form.unit_price }}</td>
+            <td class="py-2 text-right">
+              {% if form.instance.pk %}{{ form.DELETE }}{% endif %}
+              <button type="button" class="remove-row text-red-500 hover:text-red-700">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <button type="button" id="add-row"
+            class="mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-lg border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+      <i class="fa-solid fa-plus"></i> {% trans "Ajouter une ligne" %}
+    </button>
+  </div>
+
+  <!-- Carte : notes -->
+  <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm p-6 mb-5">
+    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+      {{ invoice_form.notes.label }}
+    </label>
+    {{ invoice_form.notes }}
+  </div>
+
+  <!-- CTA -->
+  <div class="text-center">
+    <button type="submit"
+            class="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-lg shadow-lg shadow-brand-600/20 transition-all hover:-translate-y-0.5">
+      🧾 {% trans "GÉNÉRER LA FACTURE" %}
+    </button>
+  </div>
+</form>
+
+<style>
+  /* Style des inputs générés par Django */
+  input[type="text"], input[type="email"], input[type="number"], input[type="date"], textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    font-size: 14px;
+    background: white;
+    color: #1a1a1a;
+    outline: none;
+  }
+  input:focus, textarea:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37,99,235,.15);
+  }
+  .dark input, .dark textarea {
+    background: #1f2937;
+    color: #f3f4f6;
+    border-color: #4b5563;
+  }
+</style>
+
+<script>
+(function () {
+  const totalForms = document.querySelector('#id_items-TOTAL_FORMS');
+  const tbody = document.querySelector('#items-table tbody');
+
+  document.getElementById('add-row').addEventListener('click', () => {
+    const idx = parseInt(totalForms.value);
+    const tpl = tbody.querySelector('.item-row').cloneNode(true);
+    tpl.querySelectorAll('input, select').forEach(el => {
+      el.name = el.name.replace(/-\d+-/, `-${idx}-`);
+      el.id = el.id.replace(/-\d+-/, `-${idx}-`);
+      if (el.type === 'number') el.value = el.name.includes('quantity') ? 1 : 0;
+      else if (el.type !== 'hidden') el.value = '';
+    });
+    tbody.appendChild(tpl);
+    totalForms.value = idx + 1;
+  });
+
+  tbody.addEventListener('click', e => {
+    if (e.target.closest('.remove-row')) {
+      const rows = tbody.querySelectorAll('.item-row');
+      if (rows.length > 1) e.target.closest('tr').remove();
+    }
+  });
+})();
+</script>
+{% endblock %}

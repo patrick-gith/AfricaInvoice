@@ -1,0 +1,153 @@
+{% extends "account/base.html" %}
+{% load i18n %}
+{% load humanize %}
+{% load static %}
+
+{% block head_title %}{% trans "Mes factures" %}{% endblock %}
+
+{% block content %}
+
+  <!-- ============ HERO ============ -->
+  <section class="mb-8 text-center animate-fadeInUp">
+    <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900 dark:text-white">
+      {% trans "Gérez vos factures en quelques secondes" %}
+    </h1>
+    <p class="mt-3 text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+      {% trans "Créez, envoyez et suivez vos factures professionnelles. Téléchargement PDF immédiat, aucune configuration requise." %}
+    </p>
+
+    <a href="{% url 'InvoiceApp:invoice_create' %}"
+       class="mt-6 inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-semibold shadow-lg shadow-brand-600/20 transition-all hover:-translate-y-0.5">
+      <i class="fa-solid fa-plus"></i>
+      {% trans "Créer une facture" %}
+    </a>
+  </section>
+
+  <!-- ============ STATS ============ -->
+  <section class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-5 shadow-sm">
+      <div class="flex items-center justify-between">
+        <span class="text-sm font-medium text-gray-500 dark:text-gray-400">
+          {% trans "Factures totales" %}
+        </span>
+        <span class="w-9 h-9 rounded-lg bg-brand-50 dark:bg-brand-900/30 text-brand-600 dark:text-brand-400 flex items-center justify-center">
+          <i class="fa-solid fa-file-invoice"></i>
+        </span>
+      </div>
+      <p class="mt-2 text-2xl font-bold text-gray-900 dark:text-white">{{ total_count }}</p>
+    </div>
+
+    <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-5 shadow-sm">
+      <div class="flex items-center justify-between">
+        <span class="text-sm font-medium text-gray-500 dark:text-gray-400">
+          {% trans "Payées" %}
+        </span>
+        <span class="w-9 h-9 rounded-lg bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+          <i class="fa-solid fa-circle-check"></i>
+        </span>
+      </div>
+      <p class="mt-2 text-2xl font-bold text-emerald-600 dark:text-emerald-400">{{ paid_count }}</p>
+    </div>
+
+    <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-5 shadow-sm">
+      <div class="flex items-center justify-between">
+        <span class="text-sm font-medium text-gray-500 dark:text-gray-400">
+          {% trans "Impayées" %}
+        </span>
+        <span class="w-9 h-9 rounded-lg bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 flex items-center justify-center">
+          <i class="fa-solid fa-clock"></i>
+        </span>
+      </div>
+      <p class="mt-2 text-2xl font-bold text-amber-600 dark:text-amber-400">{{ unpaid_count }}</p>
+    </div>
+  </section>
+
+  <!-- ============ LISTE ============ -->
+  <section class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden animate-fadeInUp">
+
+    <header class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+      <h2 class="font-semibold text-gray-900 dark:text-white">
+        <i class="fa-solid fa-list text-brand-600 dark:text-brand-400 mr-2"></i>
+        {% trans "Toutes les factures" %}
+      </h2>
+      <a href="{% url 'InvoiceApp:invoice_create' %}"
+         class="text-sm font-medium text-brand-600 dark:text-brand-400 hover:underline">
+        + {% trans "Ajouter" %}
+      </a>
+    </header>
+
+    {% if invoices %}
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead class="bg-gray-50 dark:bg-gray-900/40 text-xs uppercase text-gray-500 dark:text-gray-400">
+          <tr>
+            <th class="px-6 py-3 text-left font-semibold">{% trans "N°" %}</th>
+            <th class="px-6 py-3 text-left font-semibold">{% trans "Client" %}</th>
+            <th class="px-6 py-3 text-left font-semibold">{% trans "Date" %}</th>
+            <th class="px-6 py-3 text-right font-semibold">{% trans "Total" %}</th>
+            <th class="px-6 py-3 text-center font-semibold">{% trans "Statut" %}</th>
+            <th class="px-6 py-3 text-right font-semibold"></th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+          {% for inv in invoices %}
+          <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/40 transition-colors">
+            <td class="px-6 py-4">
+              <span class="font-mono font-semibold text-gray-900 dark:text-white">{{ inv.number }}</span>
+            </td>
+            <td class="px-6 py-4">
+              <div class="flex items-center gap-2">
+                <span class="w-8 h-8 rounded-full bg-brand-100 dark:bg-brand-900/40 text-brand-700 dark:text-brand-300 flex items-center justify-center text-xs font-bold">
+                  {{ inv.client.name|first|upper }}
+                </span>
+                <span class="text-gray-700 dark:text-gray-300">{{ inv.client.name }}</span>
+              </div>
+            </td>
+            <td class="px-6 py-4 text-gray-500 dark:text-gray-400">
+              {{ inv.issue_date|date:"d/m/Y" }}
+            </td>
+            <td class="px-6 py-4 text-right font-semibold text-gray-900 dark:text-white">
+              {{ inv.total|floatformat:0|intcomma }} FCFA
+            </td>
+            <td class="px-6 py-4 text-center">
+              {% if inv.status == "paid" %}
+                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300">
+                  <i class="fa-solid fa-circle-check"></i> {% trans "Payée" %}
+                </span>
+              {% else %}
+                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">
+                  <i class="fa-solid fa-clock"></i> {% trans "Impayée" %}
+                </span>
+              {% endif %}
+            </td>
+            <td class="px-6 py-4 text-right">
+              <a href="{% url 'InvoiceApp:invoice_detail' inv.pk %}"
+                 class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                <i class="fa-solid fa-eye"></i> {% trans "Voir" %}
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="py-16 text-center">
+      <div class="w-16 h-16 mx-auto rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center mb-4">
+        <i class="fa-solid fa-file-invoice text-2xl text-gray-400"></i>
+      </div>
+      <p class="text-gray-700 dark:text-gray-300 font-medium">
+        {% trans "Aucune facture pour le moment" %}
+      </p>
+      <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+        {% trans "Créez votre première facture en un clic." %}
+      </p>
+      <a href="{% url 'InvoiceApp:invoice_create' %}"
+         class="mt-5 inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-brand-600 hover:bg-brand-700 text-white font-semibold shadow-sm transition-colors">
+        <i class="fa-solid fa-plus"></i> {% trans "Créer une facture" %}
+      </a>
+    </div>
+    {% endif %}
+  </section>
+
+{% endblock %}

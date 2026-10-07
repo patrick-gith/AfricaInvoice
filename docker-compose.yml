@@ -1,0 +1,53 @@
+services:
+  web:
+    build: .
+    container_name: africa_invoice_web
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      # Django
+      DEBUG: "False"
+      SECRET_KEY: "dev-secret-key-change-in-prod-please"
+      ALLOWED_HOSTS: "localhost,127.0.0.1,0.0.0.0"
+      # Base de données (interne au réseau Docker)
+      DATABASE_URL: "postgresql://invoice:invoice@db:5432/invoice"
+      # Entreprise
+      COMPANY_NAME: "ABC BUSINESS"
+      COMPANY_ADDRESS: "Yaoundé, Cameroun"
+      COMPANY_PHONE: "+237 6 XX XX XX XX"
+      COMPANY_EMAIL: "contact@abcbusiness.cm"
+      COMPANY_TAX_ID: "M0123456789"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - static_volume:/app/staticfiles
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  db:
+    image: postgres:16-alpine
+    container_name: africa_invoice_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: invoice
+      POSTGRES_PASSWORD: invoice
+      POSTGRES_DB: invoice
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"   # 5433 en local pour ne pas conflicter avec ton Postgres WSL
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U invoice -d invoice"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  pgdata:
+  static_volume:

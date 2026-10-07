@@ -1,0 +1,91 @@
+{% extends "account/base.html" %}
+{% load i18n %}
+
+{% block head_title %}{{ invoice.number }}{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto animate-fadeInUp">
+
+  <!-- Carte facture -->
+  <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm p-6 mb-5">
+    <div class="flex items-start justify-between flex-wrap gap-4">
+      <div>
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-white font-mono">{{ invoice.number }}</h1>
+        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+          {{ invoice.issue_date|date:"d/m/Y" }}
+          {% if invoice.status == "paid" %}
+            • <span class="text-emerald-600 dark:text-emerald-400">✅ {% trans "Payée" %}</span>
+          {% else %}
+            • <span class="text-amber-600 dark:text-amber-400">⏳ {% trans "Impayée" %}</span>
+          {% endif %}
+        </p>
+      </div>
+      <a href="{% url 'InvoiceApp:invoice_pdf' invoice.pk %}"
+         class="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-brand-600 hover:bg-brand-700 text-white font-semibold shadow-sm transition-colors">
+        <i class="fa-solid fa-download"></i>
+        {% trans "Télécharger PDF" %}
+      </a>
+    </div>
+
+    <hr class="my-5 border-gray-200 dark:border-gray-700">
+
+    <p class="text-gray-700 dark:text-gray-300">
+      <strong>{% trans "Client" %} :</strong> {{ invoice.client.name }}
+      {% if invoice.client.phone %} — {{ invoice.client.phone }}{% endif %}
+    </p>
+
+    <table class="w-full mt-5 text-sm">
+      <thead class="text-xs uppercase text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-700">
+        <tr>
+          <th class="py-2 text-left">{% trans "Produit" %}</th>
+          <th class="py-2 text-right">{% trans "Qté" %}</th>
+          <th class="py-2 text-right">{% trans "PU" %}</th>
+          <th class="py-2 text-right">{% trans "Total" %}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in invoice.items.all %}
+        <tr class="border-b border-gray-100 dark:border-gray-700">
+          <td class="py-2">{{ item.description }}</td>
+          <td class="py-2 text-right">{{ item.quantity }}</td>
+          <td class="py-2 text-right">{{ item.unit_price|floatformat:0 }} FCFA</td>
+          <td class="py-2 text-right">{{ item.line_total|floatformat:0 }} FCFA</td>
+        </tr>
+        {% endfor %}
+        <tr class="font-bold text-gray-900 dark:text-white">
+          <td colspan="3" class="py-3 text-right">{% trans "TOTAL" %}</td>
+          <td class="py-3 text-right text-lg">{{ invoice.total|floatformat:0 }} FCFA</td>
+        </tr>
+      </tbody>
+    </table>
+
+    {% if invoice.notes %}
+      <p class="mt-5 text-gray-500 dark:text-gray-400 italic">{{ invoice.notes }}</p>
+    {% endif %}
+  </div>
+
+  <!-- Actions -->
+  <div class="flex flex-wrap gap-3">
+    <form method="post" action="{% url 'InvoiceApp:invoice_toggle' invoice.pk %}">
+      {% csrf_token %}
+      <button class="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+        <i class="fa-solid {% if invoice.status == 'paid' %}fa-rotate-left{% else %}fa-check{% endif %}"></i>
+        {% if invoice.status == "paid" %}{% trans "Marquer impayée" %}{% else %}{% trans "Marquer payée" %}{% endif %}
+      </button>
+    </form>
+
+    <form method="post" action="{% url 'InvoiceApp:invoice_delete' invoice.pk %}"
+          onsubmit="return confirm('{% trans "Supprimer cette facture ?" %}')">
+      {% csrf_token %}
+      <button class="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-red-300 dark:border-red-700 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors">
+        <i class="fa-solid fa-trash"></i> {% trans "Supprimer" %}
+      </button>
+    </form>
+
+    <a href="{% url 'InvoiceApp:index' %}"
+       class="ml-auto inline-flex items-center gap-2 px-4 py-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+      <i class="fa-solid fa-arrow-left"></i> {% trans "Retour" %}
+    </a>
+  </div>
+</div>
+{% endblock %}

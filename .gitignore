@@ -1,0 +1,34 @@
+# Python
+env/
+venv/
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# Django
+*.sqlite3
+db.sqlite3
+staticfiles/
+media/
+
+# Variables d'environnement
+.env
+.env.local
+.env.production
+
+# Traductions compilées
+*.mo
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+*.log
