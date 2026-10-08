@@ -1,92 +1,285 @@
+{% load i18n %}
+
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="{{ LANGUAGE_CODE|default:'fr' }}">
 <head>
 <meta charset="UTF-8">
+
 <style>
-  @page { size: A4; margin: 2cm; }
-  body { font-family: "Helvetica", sans-serif; color: #1a1a1a; font-size: 13px; }
-  .header { display: flex; justify-content: space-between; border-bottom: 3px solid #0f172a; padding-bottom: 16px; }
-  .company h1 { margin: 0 0 6px 0; color: #0f172a; font-size: 24px; letter-spacing: 1px; }
-  .company p { margin: 2px 0; color: #64748b; }
-  .invoice-info { text-align: right; }
-  .invoice-info h2 { margin: 0; color: #0f172a; font-size: 28px; letter-spacing: 2px; }
-  .invoice-info p { margin: 3px 0; color: #64748b; }
-  .client { margin: 30px 0 20px 0; }
-  .client h3 { margin: 0 0 6px 0; color: #64748b; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; }
-  .client p { margin: 3px 0; }
-  table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-  th { background: #0f172a; color: white; text-align: left; padding: 10px; font-size: 11px; text-transform: uppercase; }
-  td { padding: 10px; border-bottom: 1px solid #e2e8f0; }
-  .right { text-align: right; }
-  .total { margin-top: 20px; text-align: right; }
-  .total .label { color: #64748b; font-size: 12px; letter-spacing: 1px; }
-  .total .value { font-size: 22px; font-weight: bold; color: #0f172a; }
-  .footer { margin-top: 60px; text-align: center; color: #94a3b8; font-size: 11px; border-top: 1px solid #e2e8f0; padding-top: 16px; }
+  @page {
+    size: A4;
+    margin: 2cm;
+  }
+
+  body {
+    font-family: "Helvetica", sans-serif;
+    color: #1a1a1a;
+    font-size: 13px;
+  }
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 3px solid #0f172a;
+    padding-bottom: 16px;
+  }
+
+  .company h1 {
+    margin: 0 0 6px 0;
+    color: #0f172a;
+    font-size: 24px;
+    letter-spacing: 1px;
+  }
+
+  .company p {
+    margin: 2px 0;
+    color: #64748b;
+  }
+
+  .invoice-info {
+    text-align: right;
+  }
+
+  .invoice-info h2 {
+    margin: 0;
+    color: #0f172a;
+    font-size: 28px;
+    letter-spacing: 2px;
+  }
+
+  .invoice-info p {
+    margin: 3px 0;
+    color: #64748b;
+  }
+
+  .client {
+    margin: 30px 0 20px 0;
+  }
+
+  .client h3 {
+    margin: 0 0 6px 0;
+    color: #64748b;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .client p {
+    margin: 3px 0;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
+
+  th {
+    background: #0f172a;
+    color: white;
+    text-align: left;
+    padding: 10px;
+    font-size: 11px;
+    text-transform: uppercase;
+  }
+
+  td {
+    padding: 10px;
+    border-bottom: 1px solid #e2e8f0;
+  }
+
+  .right {
+    text-align: right;
+  }
+
+  .total {
+    margin-top: 20px;
+    text-align: right;
+  }
+
+  .total .label {
+    color: #64748b;
+    font-size: 12px;
+    letter-spacing: 1px;
+  }
+
+  .total .value {
+    font-size: 22px;
+    font-weight: bold;
+    color: #0f172a;
+  }
+
+  .footer {
+    margin-top: 60px;
+    text-align: center;
+    color: #94a3b8;
+    font-size: 11px;
+    border-top: 1px solid #e2e8f0;
+    padding-top: 16px;
+  }
 </style>
 </head>
+
 <body>
+
   <div class="header">
+
     <div class="company">
-  {% if logo_data_url %}
-    <img src="{{ logo_data_url }}" alt="Logo" style="height: 170px; margin-bottom: 8px; display: block;">
-  {% else %}
-    <div style="height:70px;background:#fee;color:#900;font-size:11px;padding:8px;border:1px solid #f00;">
-      ⚠️ LOGO MANQUANT — vérifie assets/logo.png
+
+      {% if logo_data_url %}
+        <img
+          src="{{ logo_data_url }}"
+          alt="{% trans 'Logo' %}"
+          style="height: 170px; margin-bottom: 8px; display: block;"
+        >
+      {% else %}
+        <div style="height:70px;background:#fee;color:#900;font-size:11px;padding:8px;border:1px solid #f00;">
+          ⚠️ {% trans "LOGO MISSING — check assets/logo.png" %}
+        </div>
+      {% endif %}
+
+      <h1>{{ company.name }}</h1>
+
+      <p>{{ company.address }}</p>
+      <p>{{ company.phone }} • {{ company.email }}</p>
+
+      <p>
+        {% trans "Tax ID" %} : {{ company.tax_id }}
+      </p>
+
     </div>
-  {% endif %}
-  <h1>{{ company.name }}</h1>
-  <p>{{ company.address }}</p>
-  <p>{{ company.phone }} • {{ company.email }}</p>
-  <p>N° Contribuable : {{ company.tax_id }}</p>
-</div>
+
     <div class="invoice-info">
-      <h2>FACTURE</h2>
-      <p><strong>{{ invoice.number }}</strong></p>
-      <p>Date : {{ invoice.issue_date|date:"d/m/Y" }}</p>
-      {% if invoice.due_date %}<p>Échéance : {{ invoice.due_date|date:"d/m/Y" }}</p>{% endif %}
+
+      <h2>{% trans "INVOICE" %}</h2>
+
+      <p>
+        <strong>{{ invoice.number }}</strong>
+      </p>
+
+      <p>
+        {% trans "Date" %} :
+        {{ invoice.issue_date|date:"d/m/Y" }}
+      </p>
+
+      {% if invoice.due_date %}
+        <p>
+          {% trans "Due date" %} :
+          {{ invoice.due_date|date:"d/m/Y" }}
+        </p>
+      {% endif %}
+
     </div>
+
   </div>
+
 
   <div class="client">
-    <h3>Facturé à</h3>
-    <p><strong>{{ client.name }}</strong></p>
-    {% if client.phone %}<p>{{ client.phone }}</p>{% endif %}
-    {% if client.email %}<p>{{ client.email }}</p>{% endif %}
-    {% if client.address %}<p>{{ client.address }}</p>{% endif %}
+
+    <h3>
+      {% trans "Billed to" %}
+    </h3>
+
+    <p>
+      <strong>{{ client.name }}</strong>
+    </p>
+
+    {% if client.phone %}
+      <p>{{ client.phone }}</p>
+    {% endif %}
+
+    {% if client.email %}
+      <p>{{ client.email }}</p>
+    {% endif %}
+
+    {% if client.address %}
+      <p>{{ client.address }}</p>
+    {% endif %}
+
   </div>
+
 
   <table>
+
     <thead>
       <tr>
-        <th>Description</th>
-        <th class="right">Qté</th>
-        <th class="right">Prix unitaire</th>
-        <th class="right">Total</th>
+
+        <th>
+          {% trans "Description" %}
+        </th>
+
+        <th class="right">
+          {% trans "Qty" %}
+        </th>
+
+        <th class="right">
+          {% trans "Unit price" %}
+        </th>
+
+        <th class="right">
+          {% trans "Total" %}
+        </th>
+
       </tr>
     </thead>
+
     <tbody>
+
       {% for item in items %}
-      <tr>
-        <td>{{ item.description }}</td>
-        <td class="right">{{ item.quantity }}</td>
-        <td class="right">{{ item.unit_price|floatformat:0 }} FCFA</td>
-        <td class="right">{{ item.line_total|floatformat:0 }} FCFA</td>
-      </tr>
+
+        <tr>
+
+          <td>
+            {{ item.description }}
+          </td>
+
+          <td class="right">
+            {{ item.quantity }}
+          </td>
+
+          <td class="right">
+            {{ item.unit_price|floatformat:0 }} FCFA
+          </td>
+
+          <td class="right">
+            {{ item.line_total|floatformat:0 }} FCFA
+          </td>
+
+        </tr>
+
       {% endfor %}
+
     </tbody>
+
   </table>
 
+
   <div class="total">
-    <div class="label">TOTAL À PAYER</div>
-    <div class="value">{{ invoice.total|floatformat:0 }} FCFA</div>
+
+    <div class="label">
+      {% trans "TOTAL DUE" %}
+    </div>
+
+    <div class="value">
+      {{ invoice.total|floatformat:0 }} FCFA
+    </div>
+
   </div>
+
 
   {% if invoice.notes %}
-  <p style="margin-top:40px;color:#64748b;font-style:italic">{{ invoice.notes }}</p>
+    <p style="margin-top:40px;color:#64748b;font-style:italic">
+      {{ invoice.notes }}
+    </p>
   {% endif %}
 
+
   <div class="footer">
-    Merci pour votre confiance — {{ company.name }}
+
+    {% trans "Thank you for your trust" %}
+    — {{ company.name }}
+
   </div>
+
 </body>
 </html>

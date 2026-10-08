@@ -39,3 +39,5 @@ docker-compose.yml
 # Docs
 docs/
 README.md
+staticfiles/
+media/
