@@ -39,6 +39,9 @@ RUN pip install --upgrade pip && \
 # ---------- Code source ----------
 COPY . .
 
+# ---------- Compilation des traductions ----------
+RUN python manage.py compilemessages
+
 # ---------- Collecte des fichiers statiques ----------
 RUN python manage.py collectstatic --noinput
 

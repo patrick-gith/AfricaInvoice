@@ -226,7 +226,8 @@ if not DEBUG:
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
 
-
+# Render termine le HTTPS au niveau de son proxy. 
+SECURE_PROXY_SSL_HEADER = ( "HTTP_X_FORWARDED_PROTO", "https", )
 # ==========================================================
 # CONFIGURATION DJANGO
 # ==========================================================
