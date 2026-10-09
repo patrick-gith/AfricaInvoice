@@ -266,7 +266,7 @@ EMAIL_BACKEND = (
 
 COMPANY_NAME = os.environ.get(
     "COMPANY_NAME",
-    "ABC BUSINESS",
+    "Invoice Generator",
 )
 
 COMPANY_ADDRESS = os.environ.get(
