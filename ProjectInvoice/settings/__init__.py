@@ -40,7 +40,7 @@ ALLOWED_HOSTS = [
     host.strip()
     for host in os.environ.get(
         "ALLOWED_HOSTS",
-        "localhost,127.0.0.1"
+        "localhost,127.0.0.1,africainvoice.onrender.com"
     ).split(",")
     if host.strip()
 ]
@@ -271,12 +271,12 @@ COMPANY_NAME = os.environ.get(
 
 COMPANY_ADDRESS = os.environ.get(
     "COMPANY_ADDRESS",
-    "Yaoundé, Cameroun",
+    "Yaoundé, Cameroun, Whatsapp: +237 6 79 18 66 20",
 )
 
 COMPANY_PHONE = os.environ.get(
     "COMPANY_PHONE",
-    "+237 6 XX XX XX XX",
+    "+237 6 79 18 66 20",
 )
 
 COMPANY_EMAIL = os.environ.get(
